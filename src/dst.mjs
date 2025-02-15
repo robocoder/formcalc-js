@@ -47,7 +47,7 @@ export class DynamicSymbolTable extends EnvironmentInterface {
         const $ = this;
         const current = $.functions.length;
         let undef;
-        
+
         $.functions.push(new Map);
         $.variables.push(new Map);
         $.passthru.push(undef);
