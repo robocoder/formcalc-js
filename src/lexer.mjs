@@ -120,7 +120,6 @@ export const GE = createToken({ name: 'GE', pattern: /ge/i, longer_alt: Identifi
 export const LT = createToken({ name: 'LT', pattern: /lt/i, longer_alt: Identifier, categories: RelationalOperator });
 export const GT = createToken({ name: 'GT', pattern: /gt/i, longer_alt: Identifier, categories: RelationalOperator });
 export const Null = createToken({ name: 'Null', pattern: /null/i, longer_alt: Identifier, categories: Literal });
-export const This = createToken({ name: 'This', pattern: /this/i, longer_alt: Identifier });
 export const NAN = createToken({ name: 'NAN', pattern: /nan/i, longer_alt: Identifier, categories: Literal });
 export const PositiveInfinity = createToken({ name: 'Infinity', pattern: /infinity/i, longer_alt: Identifier, categories: Literal });
 export const True = createToken({ name: 'True', pattern: /true/i, longer_alt: Identifier, categories: Literal });
@@ -199,7 +198,6 @@ export const allTokens = [
     LT,
     GT,
     Null,
-    This,
     NAN,
     PositiveInfinity,
     True,
