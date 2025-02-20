@@ -33,7 +33,7 @@ Inspired by [htmx](https://htmx.org/) and the [locality of behavior](https://htm
 
 * JetForm. [XFA-FormCalc 1.0](https://www.w3.org/1999/05/XFA/xfa-formcalc.html), 1999-05-14.
 * Adobe. [XFA-FormCalc 3.3](https://helpx.adobe.com/content/dam/Adobe/specs/xfa_spec_3_3.pdf), 2012-01-09, pp 1049-1077.
-* Adobe. [Designer FormCalc Reference: AEM 6.3 Forms](https://helpx.adobe.com/pdf/aem-forms/6-3/formcalc-reference.pdf), 2017-04-26.
+* Adobe. [AEM 6.3 Forms: Designer FormCalc Reference](https://helpx.adobe.com/pdf/aem-forms/6-3/formcalc-reference.pdf), 2017-04-26.
 
 ## Accompanying Documentation
 
