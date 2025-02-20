@@ -26,6 +26,11 @@ For a leaner implementation, the core interpreter excludes:
 
 We plan to provide a mechanism for form designers and developers to plug-in their own function libraries, written in FormCalc and/or native JavaScript.
 
+For historical reference, a consolidated (pre-implementation) grammar can be found here:
+
+* [syntax diagram](https://github.com/robocoder/formcalc-js/blob/main/adr/syntax-diagram.html)
+* [FormCalc.g4](https://github.com/robocoder/formcalc-js/blob/main/adr/FormCalc.g4)
+
 ## Consequences
 
 ### Non-Conformance

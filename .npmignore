@@ -1,0 +1,9 @@
+.vagrant
+Vagrantfile
+adr/
+dist/index.html
+src/
+tests/
+*.config.js
+*.config.mjs
+*.tgz

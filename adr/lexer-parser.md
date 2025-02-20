@@ -31,3 +31,15 @@ The only downside is chevrotain's distribution currently hovers around 137 kB (m
 
 * [Smaller web bundle size](https://github.com/Chevrotain/chevrotain/issues/1697)
 * [Extract diagrams to a separate sub-package](https://github.com/Chevrotain/chevrotain/issues/1395)
+
+In future, we might investigate a full port to ANTLR 4:
+
+* some of the groundwork is done (i.e., FormCalc.g4)
+* ANTLR 4 supports 10 target languages including JavaScript
+* the JavaScript runtime hovers around 116 kB (minified)
+
+However, the biggest drawback is build dependencies, e.g.,
+
+* outdated versions of antlr4-tools, e.g., Ubuntu 24.04 LTS has antlr 4.9.2 in its package repository (released 2021-03-11)
+* `pip` (or `pipx`) install antlr4-tools
+* Java JRE 11 required

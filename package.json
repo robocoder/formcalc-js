@@ -2,7 +2,6 @@
   "name": "formcalc",
   "version": "1.0.0",
   "description": "JavaScript implementation of the XFA-FormCalc lexical and syntactical grammar",
-  "private": true,
   "directories": {
     "test": "tests"
   },
