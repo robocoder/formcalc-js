@@ -38,7 +38,7 @@ Inspired by [htmx](https://htmx.org/) and the [locality of behavior](https://htm
 ## Accompanying Documentation
 
 Subject to the [W3C Document Notice/License](https://www.w3.org/copyright/document-license-2023/), the lexical and syntactical grammar as implemented by `formcalc-js` can be found in the same repository:
-* [Annotated Lexical and Syntactical Grammar](https://github.com/vipsoft/formcalc-js/adr/grammar.md)
+* [Annotated Lexical and Syntactical Grammar](https://github.com/robocoder/formcalc-js/blob/main/adr/language-spec.md)
 
 ## License
 
