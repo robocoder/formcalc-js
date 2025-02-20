@@ -1,22 +1,39 @@
 "use strict";
 
 import { DynamicSymbolTable } from "./dst.mjs";
-import { FormCalculator, parseFormCalc } from "./interpreter.mjs";
+import { lexer, parser, FormCalculator } from "./interpreter.mjs";
 
-let locales;
-/*
-const locales = typeof(navigator) == 'undefined'
-    ? (new Intl.ListFormat).resolvedOptions().locale
-    : navigator?.languages || navigator.language;
-*/
+export function calculate(text, host) {
+    const lexResult = lexer.tokenize(text);
 
-const calculator = new FormCalculator(new DynamicSymbolTable, locales);
+    let errors = lexResult.errors;;
+    let cst;
+    let result;
 
-export function calculate(text) {
-    const cst = parseFormCalc(text);
-    const result = calculator.visit(cst);
+    if ( ! errors?.length) {
+        // setting a new input will RESET the parser instance's state
+        parser.input = lexResult.tokens;
 
-    console.log(result);
+        // any top level rule may be used as an entry point
+        cst = parser.formCalculation();
+        errors = parser.errors;
 
-    return result;
-};
+        if ( ! errors?.length) {
+            if (typeof(host) === 'undefined') {
+                host = new DynamicSymbolTable;
+            }
+
+            // @todo inject the host environment
+            const calculator = new FormCalculator(host);
+
+            result = calculator.visit(cst);
+            errors = calculator.errors;
+        }
+    }
+
+    return {
+        cst: cst,
+        errors: errors,
+        result: result
+    };
+}

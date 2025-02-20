@@ -3,20 +3,28 @@
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
 import { DynamicSymbolTable } from "../src/dst.mjs";
-import { FormCalculator, parseFormCalc } from "../src/interpreter.mjs";
+import { lexer, parser, FormCalculator } from "../src/interpreter.mjs";
 
 // helpers for data-driven tests
 function expectEquals(expected, data) {
+  const lexResult = lexer.tokenize(data);
+
+  parser.input = lexResult.tokens;
+
+  const cst = parser.formCalculation();
   const calculator = new FormCalculator(new DynamicSymbolTable);
-  const cst = parseFormCalc(data);
   const result = calculator.visit(cst);
 
   assert.strictEqual(result, expected);
 }
 
 function expectThrows(expected, data) {
+  const lexResult = lexer.tokenize(Array.isArray(data) ? data[0] : data);
+
+  parser.input = lexResult.tokens;
+
+  const cst = parser.formCalculation();
   const calculator = new FormCalculator(new DynamicSymbolTable);
-  const cst = parseFormCalc(Array.isArray(data) ? data[0] : data);
 
   assert.throws(() => { calculator.visit(cst) }, expected);
 }

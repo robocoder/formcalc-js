@@ -12,8 +12,8 @@ export class DynamicSymbolTableException extends Error {}
  * - names of functions are case-insensitive
  */
 export class DynamicSymbolTable extends EnvironmentInterface {
-    constructor() {
-        super();
+    constructor(locales) {
+        super(locales);
 
         const $ = this;
         let undef;

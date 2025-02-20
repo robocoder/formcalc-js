@@ -1,39 +1,10 @@
 "use strict";
 
-import * as FormCalc from "./parser.mjs";
+import { allTokens, Lexer, Parser } from "./parser.mjs";
 
-// wrapping it all together
-
-const lexer = new FormCalc.Lexer(FormCalc.allTokens, {traceInitPerf: false, skipValidations: false, ensureOptimizations: true, recoveryEnabled: false});
-const parser = new FormCalc.Parser(FormCalc.allTokens, {traceInitPerf: false, skipValidations: false, outputCst: true});
-
-export function parseFormCalc(text) {
-    const lexResult = lexer.tokenize(text);
-
-    // setting a new input will RESET the parser instance's state
-    parser.input = lexResult.tokens;
-
-    // any top level rule may be used as an entry point
-    const cst = parser.formCalculation();
-
-    /*
-    console.log(cst);
-    console.log(lexResult.errors);
-    console.log(parser.errors);
-    */
-
-    if (lexResult.errors?.length) {
-        throw new Error('Tokenization failed: ' + lexResult.errors[0].message);
-    }
-
-    if (parser.errors?.length) {
-        throw new Error('Parsing failed: ' + parser.errors[0].message);
-    }
-
-    return cst;
-}
-
-const BaseVisitor = parser.getBaseCstVisitorConstructor();
+// @todo skipValidations: true
+export const lexer = new Lexer(allTokens, {traceInitPerf: false, skipValidations: false, ensureOptimizations: true, recoveryEnabled: false});
+export const parser = new Parser(allTokens, {traceInitPerf: false, skipValidations: false, outputCst: true});
 
 // on 'exit'
 class FormCalcExit extends Error {}
@@ -47,13 +18,16 @@ class FormCalcContinue extends Error {}
 // on 'break'
 class FormCalcBreak extends Error {}
 
+// this is why we have to instantiate the parser above instead of in the engine
+const BaseVisitor = parser.getBaseCstVisitorConstructor();
+
 // evaluate formCalculation
 export class FormCalculator extends BaseVisitor {
-    constructor(environment, locales) {
+    constructor(environment) {
         super();
 
         this.env = environment;
-        this.locales = locales;
+        this.errors = [];
 
         this.validateVisitor();
     }
@@ -135,7 +109,7 @@ export class FormCalculator extends BaseVisitor {
     equalityExpression(ctx) {
         return this.binaryExprUtility(ctx, 'relationalExpression', 'EqualityOperator', (lhs, operator, rhs) => {
             if (typeof(lhs) == 'string' && typeof(rhs) == 'string') {
-                const c = lhs.localeCompare(rhs, this.locales);
+                const c = lhs.localeCompare(rhs, this.env.locales);
 
                 switch (operator) {
                     case 'EqualsEquals':
@@ -168,7 +142,7 @@ export class FormCalculator extends BaseVisitor {
     relationalExpression(ctx) {
         return this.binaryExprUtility(ctx, 'additiveExpression', 'RelationalOperator', (lhs, operator, rhs) => {
             if (typeof(lhs) == 'string' && typeof(rhs) == 'string') {
-                const c = lhs.localeCompare(rhs, this.locales);
+                const c = lhs.localeCompare(rhs, this.env.locales);
 
                 switch (operator) {
                     case 'LessThanEquals':

@@ -6,6 +6,16 @@
  * Environment base class / interface between the interpreter and engine (host environment)
  */
 export class EnvironmentInterface {
+    constructor(locales) {
+        if (typeof(locales) == 'undefined') {
+            locales = typeof(navigator) == 'undefined'
+                    ? (new Intl.ListFormat).resolvedOptions().locale
+                    : navigator?.languages || navigator.language;
+        }
+
+        this.locales = locales;
+    }
+
     /**
      * Reset
      */
