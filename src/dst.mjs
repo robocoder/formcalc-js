@@ -12,44 +12,45 @@ export class DynamicSymbolTableException extends Error {}
  * - names of functions are case-insensitive
  */
 export class DynamicSymbolTable extends EnvironmentInterface {
-    constructor() {
-        super();
+    constructor(locales) {
+        super(locales);
 
         const $ = this;
-        let undef;
 
         // initialize root (global) scope
         $.functions = new Array(new Map);
         $.variables = new Array(new Map);
-        $.passthru = new Array();
-        $.passthru.push(undef);
+        $.contexts = new Array(1);
+        $.passthru = new Array(1);
     }
 
     /**
-     * Reset
+     * Reset, preserving only the root (global) scope
      */
     reset() {
         const $ = this;
-        let undef;
 
         $.functions.splice(1);
         $.variables.splice(1);
-        $.passthru = new Array();
-        $.passthru.push(undef);
+        $.contexts = new Array(1);
+        $.passthru = new Array(1);
     }
 
     /**
      * Push new block scope
      *
+     * @param string name
+     *
      * @return integer
      */
-    push() {
+    push(name) {
         const $ = this;
         const current = $.functions.length;
         let undef;
 
         $.functions.push(new Map);
         $.variables.push(new Map);
+        $.contexts.push(name);
         $.passthru.push(undef);
 
         return current;
@@ -74,6 +75,7 @@ export class DynamicSymbolTable extends EnvironmentInterface {
         if (typeof(to) == 'undefined') {
             $.functions.pop();
             $.variables.pop();
+            $.contexts.pop();
             $.passthru.pop();
 
             return result;
@@ -81,9 +83,49 @@ export class DynamicSymbolTable extends EnvironmentInterface {
 
         $.functions.splice(to);
         $.variables.splice(to);
+        $.contexts.splice(to);
         $.passthru.splice(to);
 
         return result;
+    }
+
+    /**
+     * Can we pop the scope here?
+     *
+     * @param string context
+     *
+     * @return boolean
+     */
+    inContext(context) {
+        const $ = this;
+
+        if (context == 'function') {
+            for (let i = $.contexts.length - 1; i > 1; i--) {
+                if ($.contexts.at(i) == 'func') {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        if (context == 'loop') {
+            for (let i = $.contexts.length - 1; i > 1; i--) {
+                switch ($.contexts.at(i)) {
+                    case 'func':
+                        return false;
+
+                    case 'while':
+                    case 'for':
+                    case 'foreach':
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        throw new DynamicSymbolTableException(`context "${context}" not supported`);
     }
 
     /**

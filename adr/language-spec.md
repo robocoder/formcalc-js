@@ -22,9 +22,9 @@ For "completeness", we will implement the lexer and parser corresponding to the 
 For a leaner implementation, the core interpreter excludes:
 
 * [built-in functions](https://helpx.adobe.com/pdf/aem-forms/6-3/formcalc-reference.pdf) for math, string, formatting, time/date, financial, etc operations
-* [scripting support](https://helpx.adobe.com/livecycle/help/mobile-forms/scripting-support.html) objects or apis (e.g., `$event` or `app.eval()`)
+* [scripting support](https://helpx.adobe.com/livecycle/help/mobile-forms/scripting-support.html) objects or APIs (e.g., `$event` or `app.eval()`)
 
-We plan to provide a mechanism for form designers and developers to plug-in their own function libraries, written in FormCalc and/or native JavaScript.
+We plan to provide a mechanism for form designers and developers to integrate with their own function libraries, written in FormCalc and/or native JavaScript.
 
 For historical reference, a consolidated (pre-implementation) grammar can be found here:
 
@@ -59,7 +59,7 @@ Implementer's Note:
 
 ### Scripting Object Model
 
-The XFA's Scripting Object Model (SOM) has an expressive syntax that will be unfamiliar to Web designers/developers more accustomed to CSS and/oor jQuery selectors.
+The XFA's Scripting Object Model (SOM) has an expressive syntax that will be unfamiliar to Web designers/developers more accustomed to CSS and/or jQuery selectors.
 
 Implementer's Note:
 
@@ -131,11 +131,11 @@ vs
 
 Implementer's Note:
 
-* the XFA-FormCalc 1.0 grammar is more straight-forward when implementing the parser using Chevrotain, a LL(K) parser building toolkit.
+* the XFA-FormCalc 1.0 grammar is more straightforward when implementing the parser using Chevrotain, a LL(K) parser building toolkit.
 
 ### Inlining Parsing Rules
 
-As a [minor runtime optimization](https://chevrotain.io/docs/guide/performance.html#minor-runtime-optimizations), the parser implementation inlines parsing rules which only parse a single Terminal.
+As a [minor runtime optimization](https://chevrotain.io/docs/guide/performance.html#minor-runtime-optimizations), the parser implementation inlines parsing rules which parse only a single Terminal.
 
 For example:
 
@@ -304,7 +304,7 @@ In XFA 3.3, the Scripting Object Model (SOM) states `this` and `$` are both vari
 Implementer's Note:
 
 * the lexer does not recognize `this` as a keyword token
-* it is at the discretion (and if so choosing, the subsequent responsibility) of the host application to set both `this` and `$` variables
+* it is at the discretion (and if chosen, the subsequent responsibility) of the host application to set both `this` and `$` variables
 
 ### Boolean Keywords
 
@@ -372,7 +372,7 @@ Implementer's Note:
 
 ### ForExpression
 
-In XFA-FormCalc 3.3, the `ForExpression` production refers to `Assignment`, and omits the optional `var` (shown in Example 25.27) or numeric constants for the end expression (show in Example 25.28):
+In XFA-FormCalc 3.3, the `ForExpression` production refers to `Assignment`, and omits the optional `var` (shown in Example 25.27) or numeric constants for the end expression (shown in Example 25.28):
 
 ```
 [48] ForExpression ::=

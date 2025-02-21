@@ -6,6 +6,16 @@
  * Environment base class / interface between the interpreter and engine (host environment)
  */
 export class EnvironmentInterface {
+    constructor(locales) {
+        if (typeof(locales) == 'undefined') {
+            locales = typeof(navigator) == 'undefined'
+                    ? (new Intl.ListFormat).resolvedOptions().locale
+                    : navigator?.languages || navigator.language;
+        }
+
+        this.locales = locales;
+    }
+
     /**
      * Reset
      */
@@ -14,9 +24,11 @@ export class EnvironmentInterface {
     /**
      * Push new block scope
      *
+     * @param string name
+     *
      * @return integer
      */
-    push() { }
+    push(name) { }
 
     /**
      * Pop block scope, optionally to a specific level; peeks at result beforehand
@@ -26,6 +38,15 @@ export class EnvironmentInterface {
      * @return mixed
      */
     pop(to) { }
+
+    /**
+     * Can we pop the scope here?
+     *
+     * @param string context
+     *
+     * @return boolean
+     */
+    inContext(context) { }
 
     /**
      * Get current scope level

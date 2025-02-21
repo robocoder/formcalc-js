@@ -3,20 +3,28 @@
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
 import { DynamicSymbolTable } from "../src/dst.mjs";
-import { FormCalculator, parseFormCalc } from "../src/interpreter.mjs";
+import { lexer, parser, FormCalculator } from "../src/interpreter.mjs";
 
 // helpers for data-driven tests
 function expectEquals(expected, data) {
+  const lexResult = lexer.tokenize(data);
+
+  parser.input = lexResult.tokens;
+
+  const cst = parser.formCalculation();
   const calculator = new FormCalculator(new DynamicSymbolTable);
-  const cst = parseFormCalc(data);
   const result = calculator.visit(cst);
 
   assert.strictEqual(result, expected);
 }
 
 function expectThrows(expected, data) {
+  const lexResult = lexer.tokenize(Array.isArray(data) ? data[0] : data);
+
+  parser.input = lexResult.tokens;
+
+  const cst = parser.formCalculation();
   const calculator = new FormCalculator(new DynamicSymbolTable);
-  const cst = parseFormCalc(Array.isArray(data) ? data[0] : data);
 
   assert.throws(() => { calculator.visit(cst) }, expected);
 }
@@ -131,6 +139,15 @@ describe('functions', () => {
             a + b + c
           endfunc
           foo(3, 4)`],
+    [10, `var a = 1
+          var b = 2
+          var c = 3
+          func foo(a, b) do
+            a + b + c
+            return
+            a * b * c
+          endfunc
+          foo(3, 4)`],
     [12, `var a = 1
           var b = 2
           var c = 3
@@ -165,6 +182,14 @@ describe('functions', () => {
   [
     'foo("bar")',
   ].forEach((element, i) => it(`undeclared function#${i}`, () => expectThrows(/not found/, element)));
+
+  [
+    'return',
+    `while (1) do
+       return
+       break
+     endwhile`,
+  ].forEach((element, i) => it(`unexpected return#${i}`, () => expectThrows(/outside of function/, element)));
 });
 
 describe('logical or', () => {
@@ -803,19 +828,77 @@ describe('for', () => {
   ].forEach((element, i) => it(`loops#${i}`, () => expectEquals(element[0], element[1])));
 
   [
+    [4, `for var i = 0 upto 10 step 1 do
+           if (i == 5) then
+              break
+           endif
+           i
+         endfor`],
+    [6, `var i
+         for i = 10 downto 0 step -1 do
+           if (i == 5) then
+               break
+           endif
+           i
+         endfor`],
+    [1, `var i
+         for i = 10 downto 0 step -1 do
+           if (i == 0) then
+               continue
+           endif
+           i
+         endfor`],
   ].forEach((element, i) => it(`interrupted loop#${i}`, () => expectEquals(element[0], element[1])));
+
+  [
+    // non-conforming?
+    `for var i = 0 upto 10 step -1 do
+       ; nothing
+     endfor`,
+    `for var i = 10 downto 0 step 1 do
+       ; nothing
+     endfor`,
+  ].forEach((element, i) => it(`guards#${i}`, () => expectThrows(/must be a (positive|negative) value/i, element)));
+
+  [
+    `func foo() do
+       break
+     endfunc
+     for var i = 0 upto 101 do
+       foo()
+     endfor`,
+    `func foo() do
+       continue
+     endfunc
+     for var i = 10 downto 0  do
+       foo()
+     endfor`,
+  ].forEach((element, i) => it(`unexpected break/continue#${i}`, () => expectThrows(/outside of loop/, element)));
 });
 
 describe('foreach', () => {
+  let u;
+
   [
+    [u,  `func foo() do endfunc
+          foreach i in ( foo() ) do
+            i
+          endfor`],
+    [u,  `func foo() do endfunc
+          foreach i in ( foo() ) do
+            throw 42
+          endfor`],
   ].forEach((element, i) => it(`never enters#${i}`, () => expectEquals(element[0], element[1])));
 
   [
-    [3, `func foo() do 3 endfunc
-         var bar = 1
-         foreach i in ( "a", "b", bar, 2 + 2, foo() ) do
-           i
-         endfor`],
+    [42, `foreach i in ( 42 ) do
+            i
+          endfor`],
+    [3,  `func foo() do 3 endfunc
+          var bar = 1
+          foreach i in ( "a", "b", bar, 2 + 2, foo() ) do
+            i
+          endfor`],
   ].forEach((element, i) => it(`loops#${i}`, () => expectEquals(element[0], element[1])));
 
   [
