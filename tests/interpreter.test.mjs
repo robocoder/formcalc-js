@@ -812,6 +812,16 @@ describe('for', () => {
 
   [
   ].forEach((element, i) => it(`interrupted loop#${i}`, () => expectEquals(element[0], element[1])));
+
+  [
+    // non-conforming?
+    `for var i = 0 upto 10 step -1 do
+       ; nothing
+     endfor`,
+    `for var i = 10 downto 0 step 1 do
+       ; nothing
+     endfor`,
+  ].forEach((element, i) => it(`guards#${i}`, () => expectThrows(/must be a (positive|negative) value/i, element)));
 });
 
 describe('foreach', () => {

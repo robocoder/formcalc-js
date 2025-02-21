@@ -327,9 +327,17 @@ export class FormCalculator extends BaseVisitor {
         if (ctx.upto) {
             conditional = () => iterator <= this.visit(ctx.endExpression);
             step = ctx.step ? this.visit(ctx.step) : 1;
+
+            if (step <= 0) {
+                throw new Error(`for .. upto .. step "${step}" must be a positive value`);
+            }
         } else {
             conditional = () => iterator >= this.visit(ctx.endExpression);
             step = ctx.step ? this.visit(ctx.step) : -1;
+
+            if (step >= 0) {
+                throw new Error(`for .. downto .. step "${step}" must be a negative value`);
+            }
         }
 
         this.env.poke(this.loopUtility(ctx, () => conditional(), () => { iterator += step; this.storeValue(id, iterator); }));
