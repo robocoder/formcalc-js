@@ -12,8 +12,8 @@ Inspired by [htmx](https://htmx.org/) and the [locality of behavior](https://htm
 <script type="importmap">
 {
   "imports": {
-    "chevrotain": "https://unpkg.com/chevrotain/lib/chevrotain.mjs",
-    "formcalc": "https://npmjs.com/formcalc/dist/formcalc.mjs"
+    "chevrotain": "https://unpkg.com/chevrotain@11.0.3/lib/chevrotain.min.mjs",
+    "formcalc": "https://unpkg.com/formcalc@1.0.1/dist/formcalc.mjs"
   }
 }
 </script>
