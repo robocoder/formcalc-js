@@ -24,9 +24,11 @@ export class EnvironmentInterface {
     /**
      * Push new block scope
      *
+     * @param string name
+     *
      * @return integer
      */
-    push() { }
+    push(name) { }
 
     /**
      * Pop block scope, optionally to a specific level; peeks at result beforehand
@@ -36,6 +38,15 @@ export class EnvironmentInterface {
      * @return mixed
      */
     pop(to) { }
+
+    /**
+     * Can we pop the scope here?
+     *
+     * @param string context
+     *
+     * @return boolean
+     */
+    inContext(context) { }
 
     /**
      * Get current scope level

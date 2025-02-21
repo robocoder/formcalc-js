@@ -34,7 +34,8 @@ export class FormCalculator extends BaseVisitor {
 
     formCalculation(ctx) {
         this.env.reset();
-        const s = this.env.push();
+
+        const s = this.env.push('');
 
         try {
             this.env.poke(this.visit(ctx.expressionList));
@@ -59,13 +60,25 @@ export class FormCalculator extends BaseVisitor {
         for (let _ in ctx) {
             switch (_) {
                 case 'Break':
-                    throw new FormCalcBreak;
+                    if (this.env.inContext('loop')) {
+                        throw new FormCalcBreak;
+                    }
+
+                    throw new Error('break outside of loop');
 
                 case 'Continue':
-                    throw new FormCalcContinue;
+                    if (this.env.inContext('loop')) {
+                        throw new FormCalcContinue;
+                    }
+
+                    throw new Error('continue outside of loop');
 
                 case 'Return':
-                    throw new FormCalcReturn;
+                    if (this.env.inContext('function')) {
+                        throw new FormCalcReturn;
+                    }
+
+                    throw new Error('return outside of function');
 
                 case 'Exit':
                     throw new FormCalcExit;
@@ -264,12 +277,16 @@ export class FormCalculator extends BaseVisitor {
             }
         }
 
-        if ( ! expressionList && ctx.elseBlock) {
-            expressionList = ctx.elseBlock[0];
+        if ( ! expressionList) {
+            if (ctx.elseBlock) {
+                expressionList = ctx.elseBlock[0];
+            } else {
+                //this.env.poke(0);
+            }
         }
 
         if (expressionList) {
-            const s = this.env.push();
+            const s = this.env.push('if');
 
             this.env.poke(this.visit(expressionList));
 
@@ -281,9 +298,9 @@ export class FormCalculator extends BaseVisitor {
 
     declarationExpression(ctx) {
         if (ctx.Var) {
-            const depth = this.env.depth();
+            const s = this.env.depth();
 
-            return this.env.set(ctx.Identifier[0].image, ctx.Equals ? this.visit(ctx.simpleExpression) : '', depth);;
+            return this.env.set(ctx.Identifier[0].image, ctx.Equals ? this.visit(ctx.simpleExpression) : '', s);;
         }
 
         // defers visit of expressionList until function is called
@@ -306,15 +323,15 @@ export class FormCalculator extends BaseVisitor {
     }
 
     whileExpression(ctx) {
-        const s = this.env.push();
+        const s = this.env.push('while');
 
-        this.env.poke(this.loopUtility(ctx, (_) => this.visit(_.condition), () => {}));
+        this.env.poke(this.loopUtility(s, ctx, (_) => this.visit(_.condition), () => {}));
 
         return this.env.pop(s);
     }
 
     forExpression(ctx) {
-        const s = this.env.push();
+        const s = this.env.push('for');
 
         const id = ctx.Identifier[0].image;
         let iterator = this.visit(ctx.startExpression);
@@ -340,7 +357,10 @@ export class FormCalculator extends BaseVisitor {
             }
         }
 
-        this.env.poke(this.loopUtility(ctx, () => conditional(), () => { iterator += step; this.storeValue(id, iterator); }));
+        this.env.poke(this.loopUtility(s, ctx, () => conditional(), () => {
+            iterator += step;
+            this.storeValue(id, iterator);
+        }));
 
         return this.env.pop(s);
     }
@@ -366,13 +386,13 @@ export class FormCalculator extends BaseVisitor {
             }
         }
 
-        const s = this.env.push();
+        const s = this.env.push('foreach');
         const id = ctx.Identifier[0].image;
         const gen = generator(this, this.visit(ctx.argumentList));
 
         this.env.set(id, '', s);
 
-        this.env.poke(this.loopUtility(ctx, () => {
+        this.env.poke(this.loopUtility(s, ctx, () => {
             let obj = gen.next();
 
             if (obj.done) {
@@ -388,7 +408,7 @@ export class FormCalculator extends BaseVisitor {
     }
 
     blockExpression(ctx) {
-        const s = this.env.push();
+        const s = this.env.push('do');
 
         this.env.poke(this.visit(ctx.expressionList));
 
@@ -469,7 +489,7 @@ export class FormCalculator extends BaseVisitor {
             throw new Error(`function "${name}" expects ${func.parameters.length} parameters but called with ${args.length} arguments`);
         }
 
-        const s = this.env.push();
+        const s = this.env.push('func');
 
         for (let i in func.parameters) {
             this.env.set(func.parameters[i], args[i], s);
@@ -628,16 +648,26 @@ export class FormCalculator extends BaseVisitor {
         return lhs;
     }
 
-    loopUtility(ctx, iterable, increment) {
+    loopUtility(s, ctx, iterable, increment) {
         while (iterable(ctx)) {
             try {
                 this.env.poke(this.visit(ctx.expressionList));
             } catch (err) {
                 if (err instanceof FormCalcContinue) {
+                    let r = this.env.pop(s + 1);
+
+                    increment(ctx);
+
+                    this.env.poke(r);
+                    //this.env.poke(0);
                     continue;
                 }
 
                 if (err instanceof FormCalcBreak) {
+                    let r = this.env.pop(s + 1);
+
+                    this.env.poke(r);
+                    //this.env.poke(0);
                     break;
                 }
 
