@@ -99,10 +99,7 @@ export class FormCalculator extends BaseVisitor {
                 return null;
             }
 
-            lhs = this.promoteAnyToNumber(lhs);
-            rhs = this.promoteAnyToNumber(rhs);
-
-            return lhs || rhs ? 1 : 0;
+            return this.promoteAnyToNumber(lhs) || this.promoteAnyToNumber(rhs) ? 1 : 0;
         });
     }
 
@@ -112,10 +109,7 @@ export class FormCalculator extends BaseVisitor {
                 return null;
             }
 
-            lhs = this.promoteAnyToNumber(lhs);
-            rhs = this.promoteAnyToNumber(rhs);
-
-            return lhs && rhs ? 1 : 0;
+            return this.promoteAnyToNumber(lhs) && this.promoteAnyToNumber(rhs) ? 1 : 0;
         });
     }
 
@@ -625,7 +619,7 @@ export class FormCalculator extends BaseVisitor {
                 return -operand;
 
             case 'Not':
-                return ! operand ? 1 : 0;
+                return operand ? 0 : 1;
         }
 
         throw new Error(`Unsupported unary operator "${operator}"`);
