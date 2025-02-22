@@ -2,8 +2,6 @@
 
 import * as FormCalc from "./lexer.mjs";
 
-export { allTokens, Lexer } from "./lexer.mjs";
-
 // parser
 // - https://www.w3.org/1999/05/XFA/xfa-formcalc.html#syntactic-grammar
 export class Parser extends FormCalc.CstParser {

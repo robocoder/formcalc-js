@@ -34,6 +34,9 @@ export class DynamicSymbolTable extends EnvironmentInterface {
         $.variables.splice(1);
         $.contexts = new Array(1);
         $.passthru = new Array(1);
+
+        // start implied block
+        $.push('');
     }
 
     /**

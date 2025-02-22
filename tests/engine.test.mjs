@@ -3,30 +3,17 @@
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
 import { DynamicSymbolTable } from "../src/dst.mjs";
-import { lexer, parser, FormCalculator } from "../src/interpreter.mjs";
+import { calculate } from "../src/engine.mjs";
 
 // helpers for data-driven tests
 function expectEquals(expected, data) {
-  const lexResult = lexer.tokenize(data);
+  const result = calculate(data);
 
-  parser.input = lexResult.tokens;
-
-  const cst = parser.formCalculation();
-  const calculator = new FormCalculator(new DynamicSymbolTable);
-  const result = calculator.visit(cst);
-
-  assert.strictEqual(result, expected);
+  assert.strictEqual(result.value, expected);
 }
 
 function expectThrows(expected, data) {
-  const lexResult = lexer.tokenize(Array.isArray(data) ? data[0] : data);
-
-  parser.input = lexResult.tokens;
-
-  const cst = parser.formCalculation();
-  const calculator = new FormCalculator(new DynamicSymbolTable);
-
-  assert.throws(() => { calculator.visit(cst) }, expected);
+  assert.throws(() => { calculate(Array.isArray(data) ? data[0] : data) }, expected);
 }
 
 describe('whitespace and comments', () => {
@@ -937,4 +924,16 @@ describe('exit', () => {
           exit`],
     [2,  '2 exit'],
   ].forEach((element, i) => it(`data set#${i}`, () => expectEquals(element[0], element[1])));
+});
+
+describe('locales', () => {
+  [
+    [1, 'de'],
+    [0, 'sv'],
+  ].forEach((element) => it(`locales#${element[1]}`, () => {
+    const locales = element[1];
+    const result = calculate('"ä" < "z"', new DynamicSymbolTable(locales));
+
+    assert.strictEqual(result.value, element[0]);
+  }))
 });

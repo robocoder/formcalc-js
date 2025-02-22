@@ -98,7 +98,7 @@ test('reset', () => {
 
   obj.reset();
 
-  assert.strictEqual(obj.passthru.length, 1);
+  assert.strictEqual(obj.passthru.length, 2);
   assert.strictEqual(typeof(obj.peek()), 'undefined');
 });
 
