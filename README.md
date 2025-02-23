@@ -19,13 +19,13 @@ Inspired by [htmx](https://htmx.org/) and the [locality of behavior](https://htm
 </script>
 
 <script type="module">
-    import { parseFormCalc } from "formcalc";
+    import { calculate } from "formcalc";
 
-    const results = parseFormCalc('1 + 3')
+    const results = calculate('1 + 3')
 
+    console.log(results.value);
     console.log(results.cst);
-    console.log(results.lexErrors);
-    console.log(results.parseErrors);
+    console.log(results.errors);
 </script>
 ```
 
