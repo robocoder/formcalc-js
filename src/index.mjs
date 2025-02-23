@@ -2,4 +2,6 @@
 
 /*eslint no-unused-vars: ["error", {"varsIgnorePattern": ".*"}]*/
 
-export { calculate } from './engine.mjs';
+export { EnvironmentInterface } from './environment.mjs';
+export { DynamicSymbolTable } from './dist.mjs';
+export { calculate, FormCalcEngine } from './engine.mjs';

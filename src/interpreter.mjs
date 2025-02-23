@@ -14,7 +14,7 @@ class FormCalcBreak extends Error {}
 
 export function factory(parser, environment) {
     // the fact that the base class depends on an instantiated parser is the reason we have a factory method
-	const BaseVisitor = parser.getBaseCstVisitorConstructor();
+    const BaseVisitor = parser.getBaseCstVisitorConstructor();
 
     class Calculator extends BaseVisitor {
         constructor(environment) {
@@ -284,7 +284,7 @@ export function factory(parser, environment) {
             if (ctx.Var) {
                 const s = this.env.depth();
 
-                return this.env.set(ctx.Identifier[0].image, ctx.Equals ? this.visit(ctx.simpleExpression) : '', s);;
+                return this.env.set(ctx.Identifier[0].image, ctx.Equals ? this.visit(ctx.simpleExpression) : '', s);
             }
 
             // defers visit of expressionList until function is called

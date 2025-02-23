@@ -6,13 +6,12 @@ import { Parser } from "./parser.mjs";
 import { factory } from "./interpreter.mjs";
 
 export class FormCalcEngine {
-    constructor(host) {
+    constructor(host, lexerOptions, parserOptions) {
         const $ = this;
 
         $.host = host;
-        // @todo skipValidations: true
-        $.lexer = new Lexer(allTokens, {traceInitPerf: false, skipValidations: false, ensureOptimizations: true, recoveryEnabled: false});
-        $.parser = new Parser(allTokens, {traceInitPerf: false, skipValidations: false, outputCst: true});
+        $.lexer = new Lexer(allTokens, lexerOptions);
+        $.parser = new Parser(allTokens, parserOptions);
         $.calculator = factory($.parser, $.host);
     }
 
@@ -28,7 +27,7 @@ export class FormCalcEngine {
         const $ = this;
         const lexResult = $.lexer.tokenize(text);
 
-        let errors = lexResult.errors;;
+        let errors = lexResult.errors;
         let cst;
         let value;
 
@@ -54,12 +53,22 @@ export class FormCalcEngine {
     }
 }
 
-export function calculate(text, host) {
+export function calculate(text, host, lexerOptions, parserOptions) {
     if (typeof(host) === 'undefined') {
         host = new DynamicSymbolTable;
     }
 
-    const engine = new FormCalcEngine(host);
+    if (typeof(lexerOptions) === 'undefined') {
+        // @todo skipValidations: true
+        lexerOptions = {traceInitPerf: false, skipValidations: false, ensureOptimizations: true, recoveryEnabled: false};
+    }
+
+    if (typeof(parserOptions) === 'undefined') {
+        // @todo skipValidations: true
+        parserOptions = {traceInitPerf: false, skipValidations: false, outputCst: true};
+    }
+
+    const engine = new FormCalcEngine(host, lexerOptions, parserOptions);
 
     return engine.calculate(text);
 }
