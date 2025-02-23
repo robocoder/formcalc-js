@@ -3,7 +3,7 @@ grammar FormCalc;
 // syntactical grammar
 
 formCalculation
-    : expressionList EOF    
+    : expressionList EOF
     ;
 
 expressionList
@@ -369,7 +369,7 @@ fragment HexDigit
 
 fragment EscapedCharacter
     : '""'
-    | '\\' 'u' HexDigit HexDigit HexDigit HexDigit 
+    | '\\' 'u' HexDigit HexDigit HexDigit HexDigit
                HexDigit HexDigit HexDigit HexDigit
     | '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;
